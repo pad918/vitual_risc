@@ -8,9 +8,9 @@ int main() {
 	ASM::Compiller cmp;
 	RISC::RV32I risc_cpu;
 	risc_cpu.loadProgram(*cmp.compile("C:/Users/mansa/source/repos/RV32I_01/RV32I_01/pgm.asm"));
-	risc_cpu.step();
-	risc_cpu.step();
-	risc_cpu.step();
+	for(int i=0; i<3; i++)
+		risc_cpu.step();
+
 	//END
 
 	int c; std::cin >> c; // Se till att den stannar kvar

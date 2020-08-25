@@ -15,6 +15,7 @@ namespace ASM {
 		std::array<std::string, 32> _IREGISTERS;
 		std::array<std::string, 32> _FREGISTERS;
 		std::array<std::string, 14> _ITYPE_INSTRUCTIONS;
+		std::array<std::string, 10> _RTYPE_INSTRUCTIONS;
 		std::vector<uint32_t> program;
 		std::vector<std::string> split(const std::string& str, const std::string& delim);
 		uint32_t generateInstruction(std::string inst, std::vector<std::string> args);

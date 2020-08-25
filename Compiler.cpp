@@ -43,6 +43,24 @@ uint32_t ASM::Compiller::generateInstruction(std::string inst, std::vector<std::
 		else if (inst == "SRAI")	{ output = output | (0b101 << 12); output = output | 0b0010011; }	//Inte av I tpye, gör en egen kategori...
 		else if (inst == "SRLI")	{ output = output | (0b101 << 12); output = output | 0b0010011; }	//Inte av I tpye, gör en egen kategori...
 	}
+	else if (std::find(_RTYPE_INSTRUCTIONS.begin(), _RTYPE_INSTRUCTIONS.end(), inst) != _RTYPE_INSTRUCTIONS.end()) {
+		if (args.size() != 3) { std::cout << "ERROR: args invalid\n"; return 0; }
+		uint16_t rd=std::stoi(args[0]), rs1= std::stoi(args[1]), rs2= std::stoi(args[2]);
+		output = output | (rd  << 7);
+		output = output | (rs1 << 15);
+		output = output | (rs2 << 20);
+		output = output | 0b0110011; // Sets op code
+		if		(inst == "ADD")		{ output = output | (0b000 << 12); output = output | (0b0000000 << 25); }
+		else if (inst == "SUB")		{ output = output | (0b000 << 12); output = output | (0b0100000 << 25); }
+		else if (inst == "SLL")		{ output = output | (0b001 << 12); output = output | (0b0000000 << 25); }
+		else if (inst == "SLT")		{ output = output | (0b010 << 12); output = output | (0b0000000 << 25); }
+		else if (inst == "SLTU")	{ output = output | (0b011 << 12); output = output | (0b0000000 << 25); }
+		else if (inst == "XOR")		{ output = output | (0b100 << 12); output = output | (0b0000000 << 25); }
+		else if (inst == "SRL")		{ output = output | (0b101 << 12); output = output | (0b0000000 << 25); }
+		else if (inst == "SRA")		{ output = output | (0b101 << 12); output = output | (0b0100000 << 25); }
+		else if (inst == "OR")		{ output = output | (0b110 << 12); output = output | (0b0000000 << 25); }
+		else if (inst == "AND")		{ output = output | (0b111 << 12); output = output | (0b0000000 << 25); }
+	}
 	else { std::cout << "ERROR: Incorrect instuction" << std::endl; return 0; }
 
 	return output;
@@ -68,6 +86,7 @@ ASM::Compiller::Compiller()
 		"FENCE", "FENCE.I"
 	};
 	_ITYPE_INSTRUCTIONS = {"ADDI", "SLTI", "SLTIU", "XORI", "ORI", "ANDI", "SLLI", "SRLI", "SRAI", "LB", "LH", "LW", "LBU", "LHU"};
+	_RTYPE_INSTRUCTIONS = {"ADD", "SUB", "SLL", "SLT", "SLTU", "XOR", "SRL", "SRA", "OR", "AND"};
 }
 
 std::vector<uint32_t> *ASM::Compiller::compile(std::string path)

@@ -44,13 +44,13 @@ BRA RESURSERE:
 #define ANDI		0b111	/*																									*/
 							
 //Instruction functions (Kommer bli många!)
-#define ADD_	xi[rd].reg =	xi[rs1].reg + xi[rs2].reg;								//Spelar ingen roll om XI är signed eller inte; INTE TESTAD!
-#define SUB_F	xi[rd].reg =	xi[rs1].reg - xi[rs2].reg;								//Spelar ingen roll om XI är signed eller inte; INTE TESTAD!
-#define SLT_	xi[rd].reg =	(signed long)xi[rs1].reg < (signed long)xi[rs2].reg;	//Oklart om det fungerar 
-#define SLTU_	xi[rd].reg =	xi[rs1].reg < xi[rs2].reg;								//Inte testad
-#define SLL_	xi[rd].reg =	xi[rs1].reg << (0b11111 & xi[rs2].reg);  				//Inte testad
-#define SRL_	xi[rd].reg =	xi[rs1].reg >> (0b11111 & xi[rs2].reg); 				//Inte testad
-#define SRA_	xi[rd].reg =	(signed long)(xi[rs1].reg >> (0b11111 & xi[rs2].reg));	//Inte testad
+#define ADD_	xi[rd].reg =	xi[rs1].reg + xi[rs2].reg;								//Testad - fungerar
+#define SUB_F	xi[rd].reg =	xi[rs1].reg - xi[rs2].reg;								//Testad - fungerar
+#define SLT_	xi[rd].reg =	(signed long)xi[rs1].reg < (signed long)xi[rs2].reg;	//Testad - fungerar 
+#define SLTU_	xi[rd].reg =	xi[rs1].reg < xi[rs2].reg;								//Testad - fungerar
+#define SLL_	xi[rd].reg =	xi[rs1].reg << (0b11111 & xi[rs2].reg);  				//Testad - fungerar
+#define SRL_	xi[rd].reg =	xi[rs1].reg >> (0b11111 & xi[rs2].reg); 				//Testad - fungerar
+#define SRA_	xi[rd].reg =	(signed long)(xi[rs1].reg >> (0b11111 & xi[rs2].reg));	//Testad - fungerar
 #define XOR_	xi[rd].reg =	xi[rs1].reg ^ xi[rs2].reg;								//Inte testad
 #define OR_		xi[rd].reg =	xi[rs1].reg | xi[rs2].reg;								//Inte testad
 #define AND_	xi[rd].reg =	xi[rs1].reg & xi[rs2].reg;								//Inte testad
@@ -120,6 +120,7 @@ void RISC::Instruction::deCodeInstruction(uint32_t inst, std::array<uint8_t, 102
 	preCalculate(inst);
 	//Instructions
 	if (opCode == OP) {
+		deCodeRtype(inst);
 		switch (funct3) {
 			case ADD: if (funct7==0){ADD_;} else {SUB_F;} break;
 			case SLL: SLL_; break;
