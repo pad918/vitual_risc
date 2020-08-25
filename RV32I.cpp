@@ -21,6 +21,17 @@ RISC::RV32I::RV32I()
 	mem[11] =	0b10010011;
 }
 
+bool RISC::RV32I::loadProgram(std::vector<uint32_t> &input)
+{
+	for (int i = 0; i < input.size(); i++) { //INTE TESTAD!
+		mem[i * 4 + 0] = input[i] >> 24;
+		mem[i * 4 + 1] = input[i] >> 16;
+		mem[i * 4 + 2] = input[i] >> 8;
+		mem[i * 4 + 3] = input[i] >> 0;
+	}
+	return true;
+}
+
 void RISC::RV32I::step()
 {
 	//Läs in hel instuktion från ram:

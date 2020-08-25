@@ -21,28 +21,28 @@ BRA RESURSERE:
 #define STORE		0b0100011 
 #define MISC_MEM	0b0001111 
 
-//Funct3 definitions:
-#define ADD			0b000
-#define SUB			0b000
-#define SLL			0b001
-#define SLT			0b010
-#define SLTU		0b011
-#define XOR			0b100
-#define SRL			0b101
-#define SRA			0b101
-#define	OR			0b110
-#define AND			0b111
-
-#define SLLI		0b001 
-#define SRLI		0b101 //Dessa har samma kod
-#define SRAI		0b101 //Dessa har samma kod
-#define ADDI		0b000
-#define SLTI		0b010
-#define SLTIU		0b011
-#define XORI		0b100
-#define ORI			0b110
-#define ANDI		0b111
-
+//Funct3 definitions:		/**************************************TWO REGISTER MATH*********************************************/
+#define ADD			0b000	/*																									*/
+#define SUB			0b000	/*																									*/
+#define SLL			0b001	/*																									*/
+#define SLT			0b010	/*																									*/
+#define SLTU		0b011	/*																									*/
+#define XOR			0b100	/*	LOGIC XOR																						*/
+#define SRL			0b101	/*	LOGIC LEFT SHIFT																				*/
+#define SRA			0b101	/*	ARITHMETRIC RIGHT SHIFT																			*/
+#define	OR			0b110	/*	LOGIC OR																						*/
+#define AND			0b111	/*	LOGIC AND																						*/
+							/***********************************REGISTER IMMIDIATE MATH******************************************/
+#define SLLI		0b001 	/*	LEEEFT SHIFT																					*/
+#define SRLI		0b101	/*	RIGHT SHIFT																						*/
+#define SRAI		0b101 	/*	ARITHMETRIC RIGHT SHIFT 																		*/
+#define ADDI		0b000	/*	ADDS RS1 REGISTER AND IMMIDIATE AND SETS DESTINATION REGISTER TO THE SUM						*/
+#define SLTI		0b010	/*																									*/
+#define SLTIU		0b011	/*																									*/
+#define XORI		0b100	/*																									*/
+#define ORI			0b110	/*																									*/
+#define ANDI		0b111	/*																									*/
+							
 //Instruction functions (Kommer bli många!)
 #define ADD_	xi[rd].reg =	xi[rs1].reg + xi[rs2].reg;								//Spelar ingen roll om XI är signed eller inte; INTE TESTAD!
 #define SUB_F	xi[rd].reg =	xi[rs1].reg - xi[rs2].reg;								//Spelar ingen roll om XI är signed eller inte; INTE TESTAD!

@@ -1,9 +1,13 @@
 #include <iostream>
 #include "RV32I.h"
+#include "Compiler.h"
 
 int main() {
+
 	//TEST
+	ASM::Compiller cmp;
 	RISC::RV32I risc_cpu;
+	risc_cpu.loadProgram(*cmp.compile("C:/Users/mansa/source/repos/RV32I_01/RV32I_01/pgm.asm"));
 	risc_cpu.step();
 	risc_cpu.step();
 	risc_cpu.step();

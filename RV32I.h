@@ -2,6 +2,7 @@
 #include <array>
 #include <stdint.h>
 #include "Instructions.h"
+#include <vector>
 
 namespace RISC {
 
@@ -17,6 +18,7 @@ namespace RISC {
 		Instruction deCoder;
 	public:
 		RV32I();
+		bool loadProgram(std::vector<uint32_t> &input);
 		void step();//Utför en instruktion
 	};
 }
