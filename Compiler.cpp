@@ -33,17 +33,18 @@ uint32_t ASM::Compiller::generateInstruction(std::string inst, std::vector<std::
 		output = output | (rd  <<  7);
 		output = output | (rs1 << 15);
 		//Add opcode and func3:
-		if		(inst == "ADDI")	{ output = output | (0b000 << 12); output = output | 0b0010011; }
-		else if (inst == "SLTI")	{ output = output | (0b010 << 12); output = output | 0b0010011; }
-		else if (inst == "SLTIU")	{ output = output | (0b011 << 12); output = output | 0b0010011; }
-		else if (inst == "XORI")	{ output = output | (0b100 << 12); output = output | 0b0010011; }
-		else if (inst == "ORI")		{ output = output | (0b110 << 12); output = output | 0b0010011; }
-		else if (inst == "ANDI")	{ output = output | (0b111 << 12); output = output | 0b0010011; }
-		else if (inst == "SLLI")	{ output = output | (0b001 << 12); output = output | 0b0010011; }
-		else if (inst == "SRAI")	{ output = output | (0b101 << 12); output = output | 0b0010011; }	//Inte av I tpye, gör en egen kategori...
-		else if (inst == "SRLI")	{ output = output | (0b101 << 12); output = output | 0b0010011; }	//Inte av I tpye, gör en egen kategori...
+		if		(inst == "ADDI")	{ output = output | (0b000 << 12); output = output | 0b0010011; } //Opcode is same in all......
+		else if (inst == "SLTI")	{ output = output | (0b010 << 12); output = output | 0b0010011; } //Opcode is same in all......
+		else if (inst == "SLTIU")	{ output = output | (0b011 << 12); output = output | 0b0010011; } //Opcode is same in all......
+		else if (inst == "XORI")	{ output = output | (0b100 << 12); output = output | 0b0010011; } //Opcode is same in all......
+		else if (inst == "ORI")		{ output = output | (0b110 << 12); output = output | 0b0010011; } //Opcode is same in all......
+		else if (inst == "ANDI")	{ output = output | (0b111 << 12); output = output | 0b0010011; } //Opcode is same in all......
+		//Annorlunda I-type instructioner
+		else if (inst == "SLLI")	{ output = output | (0b001 << 12); output = output | 0b0010011; output = output | (0b0000000 << 25); } //Bordeee typ funka...
+		else if (inst == "SRAI")	{ output = output | (0b101 << 12); output = output | 0b0010011; output = output | (0b0000000 << 25); } //Bordeee typ funka...	
+		else if (inst == "SRLI")	{ output = output | (0b101 << 12); output = output | 0b0010011; output = output | (0b0100000 << 25); } //Bordeee typ funka...
 	}
-	else if (std::find(_RTYPE_INSTRUCTIONS.begin(), _RTYPE_INSTRUCTIONS.end(), inst) != _RTYPE_INSTRUCTIONS.end()) {
+	else if (std::find(_RTYPE_INSTRUCTIONS.begin(), _RTYPE_INSTRUCTIONS.end(), inst) != _RTYPE_INSTRUCTIONS.end()) { //Om det är en r_type instruktion
 		if (args.size() != 3) { std::cout << "ERROR: args invalid\n"; return 0; }
 		uint16_t rd=std::stoi(args[0]), rs1= std::stoi(args[1]), rs2= std::stoi(args[2]);
 		output = output | (rd  << 7);
@@ -61,15 +62,27 @@ uint32_t ASM::Compiller::generateInstruction(std::string inst, std::vector<std::
 		else if (inst == "OR")		{ output = output | (0b110 << 12); output = output | (0b0000000 << 25); }
 		else if (inst == "AND")		{ output = output | (0b111 << 12); output = output | (0b0000000 << 25); }
 	}
+	else if (std::find(_STYPE_INSTRUCTIONS.begin(), _STYPE_INSTRUCTIONS.end(), inst) != _STYPE_INSTRUCTIONS.end()) { //Om det är en s_type instruktion
+		if (args.size() != 3) { std::cout << "ERROR: args invalid\n"; return 0; }
+		uint16_t rs1 = std::stoi(args[0]), rs2 = std::stoi(args[1]);
+		int16_t imm12 = std::stoi(args[2]);
+		uint16_t immH = (imm12 & 0b111111100000) >> 5, immL = imm12 & 0b000000011111;
+		output = output | (immH << 25);
+		output = output | (immL <<  7);
+		output = output | (rs1  << 15);
+		output = output | (rs2  << 20);
+		//Set op code
+		output = output | (0b0100011);
+		//Set funct3
+		if		(inst == "SB")		{ output = output | (0b000 << 12); }
+		else if (inst == "SH")		{ output = output | (0b001 << 12); }
+		else if (inst == "SW")		{ output = output | (0b010 << 12); }
+		else if (inst == "SBU")		{ output = output | (0b100 << 12); }
+		else if (inst == "SHU")		{ output = output | (0b101 << 12); }
+	}
 	else { std::cout << "ERROR: Incorrect instuction" << std::endl; return 0; }
 
 	return output;
-}
-
-bool ASM::Compiller::is_ITYPE(std::string input)
-{
-	
-	return false;
 }
 
 ASM::Compiller::Compiller()
@@ -87,6 +100,8 @@ ASM::Compiller::Compiller()
 	};
 	_ITYPE_INSTRUCTIONS = {"ADDI", "SLTI", "SLTIU", "XORI", "ORI", "ANDI", "SLLI", "SRLI", "SRAI", "LB", "LH", "LW", "LBU", "LHU"};
 	_RTYPE_INSTRUCTIONS = {"ADD", "SUB", "SLL", "SLT", "SLTU", "XOR", "SRL", "SRA", "OR", "AND"};
+	_STYPE_INSTRUCTIONS = {"SB", "SH", "SW", "SBU", "SHU"};
+	_UTYPE_INSTRUCTIONS = {"LUI", "AUIPC"};
 }
 
 std::vector<uint32_t> *ASM::Compiller::compile(std::string path)
@@ -101,21 +116,27 @@ std::vector<uint32_t> *ASM::Compiller::compile(std::string path)
 			if (commentId != std::string::npos) //if there is a comment remove it
 				line.erase(line.begin() + commentId, line.end());
 			std::size_t letterId = line.find_first_of("ABCDEEFGHIJKLMNOPQRSTUVWXYZ"); // find fist char pos of instruction 
-			if(letterId != std::string::npos) // Remove white spaces before first letter
+			if (letterId != std::string::npos) // Remove white spaces before first letter
 				line.erase(line.begin(), line.begin() + letterId);
 			std::size_t codeEndId = line.find_first_of(" \t");
-			if (codeEndId == std::string::npos) { std::cout << "ERROR: INCORRECT FORMAT!"; }
-			std::string inst = line.substr(0, codeEndId);
-			std::string tmp = line.substr(codeEndId, line.size() - codeEndId);
-			std::vector<std::string> args = split(tmp, ",");
-			for (std::string &a : args) {
-				std::size_t fisrtNonSpace = a.find_first_not_of(" \t"); // REMOVE BLANKS BEFORE
-				if (fisrtNonSpace != std::string::npos) { a.erase(a.begin(), a.begin() + fisrtNonSpace); }
-				std::size_t lastId = a.find_last_not_of(" \t"); // REMOVE BLANKS AFTER
-				if (lastId != std::string::npos && lastId != a.size()-1) { a.erase(a.begin() + lastId + 1, a.end()); }
+			if (line != "") {
+				if (codeEndId == std::string::npos) {
+					std::cout << "ERROR: INCORRECT FORMAT!";
+					program.clear(); return &program;
+				}
+				std::string inst = line.substr(0, codeEndId);
+				std::string tmp = line.substr(codeEndId, line.size() - codeEndId);
+				std::vector<std::string> args = split(tmp, ",");
+				for (std::string &a : args) {
+					std::size_t fisrtNonSpace = a.find_first_not_of(" \t"); // REMOVE BLANKS BEFORE
+					if (fisrtNonSpace != std::string::npos) { a.erase(a.begin(), a.begin() + fisrtNonSpace); }
+					std::size_t lastId = a.find_last_not_of(" \t"); // REMOVE BLANKS AFTER
+					if (lastId != std::string::npos && lastId != a.size() - 1) { a.erase(a.begin() + lastId + 1, a.end()); }
+				}
+				uint32_t tmpCode = generateInstruction(inst, args);
+				if (tmpCode != 0)
+					program.push_back(tmpCode);
 			}
-			// Pass instruction and argumnt string vectors for processing.
-			program.push_back(generateInstruction(inst, args));
 		}
 		file.close();
 	}
