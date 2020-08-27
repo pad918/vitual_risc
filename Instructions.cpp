@@ -1,9 +1,11 @@
 ﻿#include "Instructions.h"
 #include <iostream>
 /*
-BRA RESURSERE:
+BRA RESURSER:
 
 	https://inst.eecs.berkeley.edu/~cs61c/resources/su18_lec/Lecture7.pdf
+
+	https://metalcode.eu/2019-12-06-rv32i.html
 
 	officiella RISC-V PDF:n
 
@@ -48,6 +50,13 @@ BRA RESURSERE:
 #define SW			0b010	/*																									*/
 #define SBU			0b100	/*																									*/
 #define SHU			0b101	/*																									*/
+							/*****************************************LOAD INSTRUCTIONS*****************************************/
+#define LB			0b000	/*																									*/
+#define LH			0b001	/*																									*/
+#define LW			0b010	/*																									*/
+#define LBU			0b100	/*																									*/
+#define LHU			0b101	/*																									*/
+
 
 //Instruction functions (Kommer bli många!)
 #define ADD_	xi[rd].reg =	xi[rs1].reg + xi[rs2].reg;								//Testad - fungerar
@@ -75,6 +84,12 @@ BRA RESURSERE:
 #define SH_		setMem(pos, xi[rs2].reg, 2);											//Inte testad
 #define SW_		setMem(pos, xi[rs2].reg, 4);											//Inte testad
 #define SHU_	setMem(pos, 0, 2); setMem(pos+2, xi[rs2].reg, 2);						//Inte testad - borde fungera
+
+#define LB_     loadMem(pos, 1,  false);												//Testad - fungerar
+#define LH_     loadMem(pos, 2, false);													//Inte testad
+#define LW_		loadMem(pos, 4, false);													//Inte testad
+#define LBU_	loadMem(pos, 1,  true);													//Testad - fungerar
+#define LHU_	loadMem(pos, 2, true);													//Inte testad
 
 RISC::Reg32::Reg32()
 {
@@ -214,12 +229,25 @@ void RISC::Instruction::deCodeInstruction(uint32_t inst)
 			default: std::cout << "funct är negativt eller för högt...\n"; break;
 		}
 	}
+	else if (opCode == LOAD) {
+		deCodeItype(inst);
+		uint32_t pos = xi[rs1].reg + imm12;
+		switch (funct3)
+		{
+			case LBU: LBU_  break;		
+			case LB: LB_	break;
+			case LH: LH_	break;
+			case LW: LW_	break;
+			case LHU: LHU_	break;
+			default: std::cout << "funct är negativt eller för högt...\n"; break;
+		}
+	}
 	else if (opCode == 123) {
 		//Att göra...
 	}
 }
 
-void RISC::Instruction::setMem(uint32_t pos, uint32_t val, uint8_t byteSize)
+void RISC::Instruction::setMem(uint32_t pos, uint32_t val, uint8_t byteSize) // Fel extended <-- ändra här!
 {
 	if (byteSize == 4) {
 		mem[pos + 0] = val >> 24;
@@ -231,5 +259,37 @@ void RISC::Instruction::setMem(uint32_t pos, uint32_t val, uint8_t byteSize)
 		mem[pos + 1] = val >> 0;
 	} else if(byteSize == 1){
 		mem[pos + 0] = val;
+	}
+}
+
+void RISC::Instruction::loadMem(uint32_t pos, uint8_t byteSize, bool isSiged)
+{
+	if (byteSize == 4) {
+		xi[rd].reg =  mem[pos + 0] << 24;
+		xi[rd].reg += mem[pos + 1] << 16;
+		xi[rd].reg += mem[pos + 2] << 8;
+		xi[rd].reg += mem[pos + 3];
+	}
+	else if (byteSize == 2) { // TESTA OM DEN SIGNEXTENDAR!
+		if (isSiged) {
+			uint32_t tmp = mem[pos + 0] << 8; tmp += mem[pos + 1];
+			tmp = signExtend(tmp, 16);
+			xi[rd].reg = tmp;
+		}
+		else {
+			uint32_t tmp = mem[pos + 0] << 8;
+			tmp += mem[pos + 1];
+			xi[rd].reg = tmp;
+		}
+	}
+	else if (byteSize == 1) {
+		if (isSiged) {
+			uint32_t tmp = mem[pos + 0];
+			tmp = signExtend(tmp, 8);
+			xi[rd].reg = tmp;
+		}
+		else {
+			xi[rd].reg = mem[pos + 0];
+		}
 	}
 }

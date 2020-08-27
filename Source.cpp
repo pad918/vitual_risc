@@ -8,7 +8,7 @@ int main() {
 	ASM::Compiller cmp;
 	RISC::Instruction risc_cpu;
 	risc_cpu.loadProgram(*cmp.compile("C:/Users/mansa/source/repos/RV32I_01/RV32I_01/pgm.asm"));
-	for(int i=0; i<3; i++)
+	for(int i=0; i<5; i++)
 		risc_cpu.step();
 
 	//END

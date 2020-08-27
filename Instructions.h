@@ -21,7 +21,7 @@ namespace RISC {
 		//Variabler
 		int opCode=0, rd=0, rs1=0, rs2=0, funct3=0, shift=0;
 		int funct7=0, imm12=0, /*Följande är speciella för flaktiva i-type: */ immL=0, immH=0; 
-		uint32_t signExtend(uint32_t input, unsigned char);
+		uint32_t signExtend(uint32_t input, unsigned char size);
 		void preCalculate(uint32_t inst);
 		void deCodeItype(uint32_t inst);
 		void deCodeRtype(uint32_t inst);
@@ -29,6 +29,7 @@ namespace RISC {
 		//Functions 
 		void deCodeInstruction(uint32_t inst);
 		void setMem(uint32_t pos, uint32_t val, uint8_t byteSize);
+		void loadMem(uint32_t pos, uint8_t byteSize, bool isSiged);
 	public:
 		Instruction();
 		bool loadProgram(std::vector<uint32_t> &input);
