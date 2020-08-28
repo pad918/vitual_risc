@@ -110,7 +110,7 @@ uint32_t RISC::Instruction::signExtend(uint32_t input, unsigned char size)
 
 void RISC::Instruction::preCalculate(uint32_t inst)
 {
-	opCode = 0b00000000000000000000000001111111 & inst; // Nice kod BTW
+	opCode = 0b00000000000000000000000001111111 & inst; 
 	funct3 = (0b00000000000000000111000000000000 & inst) >> 12;
 }
 
@@ -143,6 +143,19 @@ void RISC::Instruction::deCodeStype(uint32_t inst)
 	imm12  =	(0b11111110000000000000000000000000 & inst) >> 20; // ska vara 5 fel
 	imm12  +=	(0b111110000000 & inst) >> 7;
 	imm12  = signExtend(imm12, 12); // tror den ska vara här...
+}
+
+void RISC::Instruction::deCodeBtype(uint32_t inst)
+{
+	funct3 = (0b00000000000000000111000000000000 & inst) >> 12;
+	rs1 = (0b11111000000000000000 & inst) >> 15;
+	rs2 = (0b1111100000000000000000000 & inst) >> 20;
+	//Imm12 är brutalt knullad i B-type instruktioner...
+	
+	imm12 =		(0b01111110000000000000000000000000 & inst) >> 20; //25 - 5  = 20
+	imm12 +=	(0b10000000000000000000000000000000 & inst) >> 19; //31 - 12 = 19
+	imm12 +=	(0b111100000000 & inst) >> 7; // 8-1 = 7
+	imm12 += (0b10000000 & inst) << 4; // 11 - 7 = 4
 }
 
 RISC::Instruction::Instruction()
@@ -241,6 +254,9 @@ void RISC::Instruction::deCodeInstruction(uint32_t inst)
 			case LHU: LHU_	break;
 			default: std::cout << "funct är negativt eller för högt...\n"; break;
 		}
+	}
+	else if (opCode == BRANCH) {
+		deCodeBtype(inst);
 	}
 	else if (opCode == 123) {
 		//Att göra...

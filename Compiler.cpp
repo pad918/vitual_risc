@@ -86,6 +86,27 @@ uint32_t ASM::Compiller::generateInstruction(std::string inst, std::vector<std::
 		else if (inst == "SBU")		{ output = output | (0b100 << 12); }
 		else if (inst == "SHU")		{ output = output | (0b101 << 12); }
 	}
+	else if (std::find(_BTYPE_INSTRUCTIONS.begin(), _BTYPE_INSTRUCTIONS.end(), inst) != _BTYPE_INSTRUCTIONS.end()) { // Om det är en B_type instruktion
+		if (args.size() != 3) { std::cout << "ERROR: args invalid\n"; return 0; }
+		uint16_t rs1 = std::stoi(args[0]), rs2 = std::stoi(args[1]);
+		int16_t imm12 = std::stoi(args[2]);
+		uint16_t i12 = imm12 >> 12;
+		uint16_t i11 = imm12 >> 11 & (0b01);
+		uint16_t i105 = imm12 >> 5 & (0b111111);
+		uint16_t i41 = imm12 >> 1 & (0b1111);
+		output = output | (0b1100011); // opcode
+		output = output | i12	<< 31;
+		output = output | i11	<< 7;
+		output = output | i105	<< 25;
+		output = output | i41	<< 8;
+		// set funct3
+		if		(inst == "BEQ")		{ output = output | (0b000 << 12); }
+		else if (inst == "BNE")		{ output = output | (0b001 << 12); }
+		else if (inst == "BLT")		{ output = output | (0b100 << 12); }
+		else if (inst == "BGE")		{ output = output | (0b101 << 12); }
+		else if (inst == "BLTU")	{ output = output | (0b110 << 12); }
+		else if (inst == "BGEU")	{ output = output | (0b111 << 12); }
+	}
 	else { std::cout << "ERROR: Incorrect instuction" << std::endl; return 0; }
 
 	return output;
@@ -108,6 +129,7 @@ ASM::Compiller::Compiller()
 	_RTYPE_INSTRUCTIONS = {"ADD", "SUB", "SLL", "SLT", "SLTU", "XOR", "SRL", "SRA", "OR", "AND"};
 	_STYPE_INSTRUCTIONS = {"SB", "SH", "SW", "SBU", "SHU"};
 	_UTYPE_INSTRUCTIONS = {"LUI", "AUIPC"};
+	_BTYPE_INSTRUCTIONS = {"BEQ", "BNE", "BLT", "BGE", "BLTU", "BGEU"};
 }
 
 std::vector<uint32_t> *ASM::Compiller::compile(std::string path)

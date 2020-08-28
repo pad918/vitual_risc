@@ -20,6 +20,7 @@ namespace ASM {
 		std::array<std::string, 10> _RTYPE_INSTRUCTIONS;
 		std::array<std::string, 5>  _STYPE_INSTRUCTIONS;
 		std::array<std::string, 2>  _UTYPE_INSTRUCTIONS;
+		std::array<std::string, 6>  _BTYPE_INSTRUCTIONS;
 		//
 		std::vector<uint32_t> program;
 		std::vector<std::string> split(const std::string& str, const std::string& delim);

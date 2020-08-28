@@ -26,6 +26,7 @@ namespace RISC {
 		void deCodeItype(uint32_t inst);
 		void deCodeRtype(uint32_t inst);
 		void deCodeStype(uint32_t inst);
+		void deCodeBtype(uint32_t inst);
 		//Functions 
 		void deCodeInstruction(uint32_t inst);
 		void setMem(uint32_t pos, uint32_t val, uint8_t byteSize);
