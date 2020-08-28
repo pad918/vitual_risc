@@ -44,6 +44,13 @@ BRA RESURSER:
 #define XORI		0b100	/*																									*/
 #define ORI			0b110	/*																									*/
 #define ANDI		0b111	/*																									*/
+							/*****************************************BRANCH INSTRUCTIONS****************************************/
+#define BEQ			0b000
+#define BNE			0b001
+#define BLT			0b100
+#define BGE			0b101
+#define BLTU		0b110
+#define BGEU		0b111
 							/*****************************************STORE INSTRUCTIONS*****************************************/
 #define SB			0b000	/*																									*/
 #define SH			0b001	/*																									*/
@@ -60,7 +67,7 @@ BRA RESURSER:
 
 //Instruction functions (Kommer bli många!)
 #define ADD_	xi[rd].reg =	xi[rs1].reg + xi[rs2].reg;								//Testad - fungerar
-#define SUB_F	xi[rd].reg =	xi[rs1].reg - xi[rs2].reg;								//Testad - fungerar
+#define SUB_	xi[rd].reg =	xi[rs1].reg - xi[rs2].reg;								//Testad - fungerar
 #define SLT_	xi[rd].reg =	(signed long)xi[rs1].reg < (signed long)xi[rs2].reg;	//Testad - fungerar 
 #define SLTU_	xi[rd].reg =	xi[rs1].reg < xi[rs2].reg;								//Testad - fungerar
 #define SLL_	xi[rd].reg =	xi[rs1].reg << (0b11111 & xi[rs2].reg);  				//Testad - fungerar
@@ -79,6 +86,13 @@ BRA RESURSER:
 #define SLLI_	xi[rd].reg =	xi[rs1].reg << immL;									//Testad - fungerar
 #define SRLI_	xi[rd].reg =	(xi[rs1].reg >> immL);									//Testad - fungerar
 #define SRAI_	xi[rd].reg =	(signed long) (xi[rs1].reg >> immL);					//Testad - fungerar
+
+#define BEQ_	pc.reg +=		(xi[rs1].reg == xi[rs2].reg) ? imm12*2 : 0;				//SKA TESTAS SNARAST!
+#define BNE_	pc.reg +=		(xi[rs1].reg != xi[rs2].reg) ? imm12*2 : 0;				//SKA TESTAS SNARAST!
+#define BLT_	pc.reg +=		((signed long)xi[rs1].reg < (signed long)xi[rs2].reg) ? imm12*2 : 0;
+#define BLTU_	pc.reg +=		(xi[rs1].reg < xi[rs2].reg) ? imm12*2 : 0;
+#define BGE_	pc.reg +=		((signed long)xi[rs1].reg >= (signed long)xi[rs2].reg) ? imm12*2 : 0;
+#define BGEU_	pc.reg +=		(xi[rs1].reg >= xi[rs2].reg) ? imm12*2 : 0;
 
 #define SB_		setMem(pos, xi[rs2].reg, 1);											//Testad - fungerar
 #define SH_		setMem(pos, xi[rs2].reg, 2);											//Inte testad
@@ -149,13 +163,14 @@ void RISC::Instruction::deCodeBtype(uint32_t inst)
 {
 	funct3 = (0b00000000000000000111000000000000 & inst) >> 12;
 	rs1 = (0b11111000000000000000 & inst) >> 15;
-	rs2 = (0b1111100000000000000000000 & inst) >> 20;
+	rs2 = (0b1111100000000000000000000 & inst) >> 20; //FELETE ÄR HÄR <------------
 	//Imm12 är brutalt knullad i B-type instruktioner...
 	
 	imm12 =		(0b01111110000000000000000000000000 & inst) >> 20; //25 - 5  = 20
 	imm12 +=	(0b10000000000000000000000000000000 & inst) >> 19; //31 - 12 = 19
 	imm12 +=	(0b111100000000 & inst) >> 7; // 8-1 = 7
 	imm12 += (0b10000000 & inst) << 4; // 11 - 7 = 4
+	imm12 = signExtend(imm12, 13); // borde vara korrekt
 }
 
 RISC::Instruction::Instruction()
@@ -178,14 +193,25 @@ bool RISC::Instruction::loadProgram(std::vector<uint32_t>& input)
 	return true;
 }
 
-void RISC::Instruction::step()
+bool RISC::Instruction::step()
 {
 	//Läs in hel instuktion från ram:
+	int pcPrev = pc.reg;
 	RISC::Reg32 inst;
 	for (int i = 3; i >= 0; i--)
 		inst.reg += mem[pc.reg + (3 - i)] << (i * 8);
-	deCodeInstruction(inst.reg);
-	pc.reg += 4; // Alla intruktioneeer är 8 byte (32bit) långa.
+	if (inst.reg != 0)
+		deCodeInstruction(inst.reg);
+	else {
+		std::cout << "ANS = " << xi[1].reg << "\n";
+		std::cout << "Calculatd in " << totalInstructions << " instructions\n";
+		std::cout << "Finished program...\n"; 
+		return true;
+	}
+	if(pc.reg == pcPrev) //gå inte fram om en branch startade
+		pc.reg += 4; // Alla intruktioneeer är 8 byte (32bit) långa.
+	totalInstructions++;
+	return false;
 }
 
 void RISC::Instruction::deCodeInstruction(uint32_t inst)
@@ -195,7 +221,7 @@ void RISC::Instruction::deCodeInstruction(uint32_t inst)
 	if (opCode == OP) {
 		deCodeRtype(inst);
 		switch (funct3) {
-			case ADD: if (funct7==0){ADD_;} else {SUB_F;} break;
+			case ADD: if (funct7==0){ADD_;} else {SUB_;} break;
 			case SLL: SLL_; break;
 			case SRL: if (funct7==0){SRL_;} else{SRA_  ;} break;
 			case SLT: SLT_; break;
@@ -257,6 +283,19 @@ void RISC::Instruction::deCodeInstruction(uint32_t inst)
 	}
 	else if (opCode == BRANCH) {
 		deCodeBtype(inst);
+		uint32_t pos = imm12; //imm12 är signed !
+		switch (funct3)
+		{
+			case BEQ: BEQ_		break;
+			case BNE: BNE_		break;
+			case BLT: BLT_		break;
+			case BLTU: BLTU_	break;
+			case BGE: BGE_		break;
+			case BGEU: BGEU_	break;
+			default: std::cout << "funct är negativt eller för högt...\n";	break;
+		}
+		bool test = (xi[rs1].reg != xi[rs2].reg);
+		int h = 0;
 	}
 	else if (opCode == 123) {
 		//Att göra...

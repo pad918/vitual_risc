@@ -95,6 +95,8 @@ uint32_t ASM::Compiller::generateInstruction(std::string inst, std::vector<std::
 		uint16_t i105 = imm12 >> 5 & (0b111111);
 		uint16_t i41 = imm12 >> 1 & (0b1111);
 		output = output | (0b1100011); // opcode
+		output = output | (rs1 << 15); //rs1
+		output = output | (rs2 << 20); //rs2
 		output = output | i12	<< 31;
 		output = output | i11	<< 7;
 		output = output | i105	<< 25;
