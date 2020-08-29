@@ -8,11 +8,12 @@ int main() {
 	//TEST
 	ASM::Compiller cmp;
 	RISC::Instruction risc_cpu;
-	risc_cpu.loadProgram(*cmp.compile("C:/Users/mansa/source/repos/RV32I_01/RV32I_01/pgm.asm"));
+	risc_cpu.loadProgram(*cmp.compile("C:/Users/mansa/source/repos/RV32I_01/RV32I_01/assembly_files/primeTester.asm"));
 	bool isRunning = true;
 	auto start = std::chrono::high_resolution_clock::now();
-	while(isRunning)
+	while (isRunning) {
 		isRunning = !risc_cpu.step();
+	}
 	auto end = std::chrono::high_resolution_clock::now();
 	//END
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);

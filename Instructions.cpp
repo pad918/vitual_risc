@@ -66,41 +66,41 @@ BRA RESURSER:
 
 
 //Instruction functions (Kommer bli många!)
-#define ADD_	xi[rd].reg =	xi[rs1].reg + xi[rs2].reg;								//Testad - fungerar
-#define SUB_	xi[rd].reg =	xi[rs1].reg - xi[rs2].reg;								//Testad - fungerar
-#define SLT_	xi[rd].reg =	(signed long)xi[rs1].reg < (signed long)xi[rs2].reg;	//Testad - fungerar 
-#define SLTU_	xi[rd].reg =	xi[rs1].reg < xi[rs2].reg;								//Testad - fungerar
-#define SLL_	xi[rd].reg =	xi[rs1].reg << (0b11111 & xi[rs2].reg);  				//Testad - fungerar
-#define SRL_	xi[rd].reg =	xi[rs1].reg >> (0b11111 & xi[rs2].reg); 				//Testad - fungerar
-#define SRA_	xi[rd].reg =	(signed long)(xi[rs1].reg >> (0b11111 & xi[rs2].reg));	//Testad - fungerar
-#define XOR_	xi[rd].reg =	xi[rs1].reg ^ xi[rs2].reg;								//Inte testad
-#define OR_		xi[rd].reg =	xi[rs1].reg | xi[rs2].reg;								//Inte testad
-#define AND_	xi[rd].reg =	xi[rs1].reg & xi[rs2].reg;								//Inte testad
+#define ADD_	xi[rd] =	xi[rs1] + xi[rs2];								//Testad - fungerar
+#define SUB_	xi[rd] =	xi[rs1] - xi[rs2];								//Testad - fungerar
+#define SLT_	xi[rd] =	(signed long)xi[rs1] < (signed long)xi[rs2];	//Testad - fungerar 
+#define SLTU_	xi[rd] =	xi[rs1] < xi[rs2];								//Testad - fungerar
+#define SLL_	xi[rd] =	xi[rs1] << (0b11111 & xi[rs2]);  				//Testad - fungerar
+#define SRL_	xi[rd] =	xi[rs1] >> (0b11111 & xi[rs2]); 				//Testad - fungerar
+#define SRA_	xi[rd] =	(signed long)(xi[rs1] >> (0b11111 & xi[rs2]));	//Testad - fungerar
+#define XOR_	xi[rd] =	xi[rs1] ^ xi[rs2];								//Inte testad
+#define OR_		xi[rd] =	xi[rs1] | xi[rs2];								//Inte testad
+#define AND_	xi[rd] =	xi[rs1] & xi[rs2];								//Inte testad
 
-#define ADDI_	xi[rd].reg =	xi[rs1].reg + imm12;									//Testad - fungerar
-#define SLTI_	xi[rd].reg =	(signed int)xi[rs1].reg < imm12;						//Testad - fungerar
-#define SLTIU_  xi[rd].reg =	xi[rs1].reg < (unsigned int) imm12;						//Testad - fungerar
-#define XORI_	xi[rd].reg =	xi[rs1].reg ^ imm12;									//Inte testad
-#define ORI_	xi[rd].reg =	xi[rs1].reg | imm12;									//Inte testad
-#define ANDI_	xi[rd].reg =	xi[rs1].reg & imm12;									//Inte testad
-#define SLLI_	xi[rd].reg =	xi[rs1].reg << immL;									//Testad - fungerar
-#define SRLI_	xi[rd].reg =	(xi[rs1].reg >> immL);									//Testad - fungerar
-#define SRAI_	xi[rd].reg =	(signed long) (xi[rs1].reg >> immL);					//Testad - fungerar
+#define ADDI_	xi[rd] =	xi[rs1] + imm12;									//Testad - fungerar
+#define SLTI_	xi[rd] =	(signed int)xi[rs1] < imm12;						//Testad - fungerar
+#define SLTIU_  xi[rd] =	xi[rs1] < (unsigned int) imm12;						//Testad - fungerar
+#define XORI_	xi[rd] =	xi[rs1] ^ imm12;									//Inte testad
+#define ORI_	xi[rd] =	xi[rs1] | imm12;									//Inte testad
+#define ANDI_	xi[rd] =	xi[rs1] & imm12;									//Inte testad
+#define SLLI_	xi[rd] =	xi[rs1] << immL;									//Testad - fungerar
+#define SRLI_	xi[rd] =	(xi[rs1] >> immL);									//Testad - fungerar
+#define SRAI_	xi[rd] =	(signed long) (xi[rs1] >> immL);					//Testad - fungerar
 
-#define BEQ_	pc.reg +=		(xi[rs1].reg == xi[rs2].reg) ? imm12*2 : 0;				//SKA TESTAS SNARAST!
-#define BNE_	pc.reg +=		(xi[rs1].reg != xi[rs2].reg) ? imm12*2 : 0;				//SKA TESTAS SNARAST!
-#define BLT_	pc.reg +=		((signed long)xi[rs1].reg < (signed long)xi[rs2].reg) ? imm12*2 : 0;
-#define BLTU_	pc.reg +=		(xi[rs1].reg < xi[rs2].reg) ? imm12*2 : 0;
-#define BGE_	pc.reg +=		((signed long)xi[rs1].reg >= (signed long)xi[rs2].reg) ? imm12*2 : 0;
-#define BGEU_	pc.reg +=		(xi[rs1].reg >= xi[rs2].reg) ? imm12*2 : 0;
+#define BEQ_	pc +=		(xi[rs1] == xi[rs2]) ? imm12*2 : 0;				//SKA TESTAS SNARAST!
+#define BNE_	pc +=		(xi[rs1] != xi[rs2]) ? imm12*2 : 0;				//SKA TESTAS SNARAST!
+#define BLT_	pc +=		((signed long)xi[rs1] < (signed long)xi[rs2]) ? imm12*2 : 0;
+#define BLTU_	pc +=		(xi[rs1] < xi[rs2]) ? imm12*2 : 0;
+#define BGE_	pc +=		((signed long)xi[rs1] >= (signed long)xi[rs2]) ? imm12*2 : 0;
+#define BGEU_	pc +=		(xi[rs1] >= xi[rs2]) ? imm12*2 : 0;
 
-#define JAL_	xi[rd].reg = pc.reg+4; pc.reg += imm20;
-#define JALR_	;
+#define JAL_	xi[rd] = pc+4; pc += imm20;
+#define JALR_	xi[rd] = pc+4; pc = pos;
 
-#define SB_		setMem(pos, xi[rs2].reg, 1);											//Testad - fungerar
-#define SH_		setMem(pos, xi[rs2].reg, 2);											//Inte testad
-#define SW_		setMem(pos, xi[rs2].reg, 4);											//Inte testad
-#define SHU_	setMem(pos, 0, 2); setMem(pos+2, xi[rs2].reg, 2);						//Inte testad - borde fungera
+#define SB_		setMem(pos, xi[rs2], 1);											//Testad - fungerar
+#define SH_		setMem(pos, xi[rs2], 2);											//Inte testad
+#define SW_		setMem(pos, xi[rs2], 4);											//Inte testad
+//#define SHU_	setMem(pos, 0, 2); setMem(pos+2, xi[rs2], 2);						//Inte testad - borde fungera
 
 #define LB_     loadMem(pos, 1,  false);												//Testad - fungerar
 #define LH_     loadMem(pos, 2, false);													//Inte testad
@@ -181,18 +181,18 @@ void RISC::Instruction::deCodeJtype(uint32_t inst)
 	rd = (0b111110000000 & inst) >> 7;
 	//Imm20 är ännu mer brutalt knullad i J-type instruktioner...
 	imm20 =		(0b01111111111000000000000000000000 & inst) >> 21; // FUNGERAR!
-	imm20 +=	(inst) >> 31 << 19;; //borde typ fungera...
+	imm20 +=	((inst & (1 << 31)) >> 31) << 19;
 	imm20 +=	(0b11111111000000000000 & inst) >> 1; // 11 - 1 = 11; 
-	imm20 +=	((inst & (1 << 20)) >> 20) << 11;
+	imm20 +=	((inst & (1 << 20)) >> 20) << 10;
 	imm20 =		signExtend(imm20, 20);
 	imm20 *=	2;
 }
 
 RISC::Instruction::Instruction()
 {
+	pc = 0;
 	memset(&mem, 0, mem.size());
-	for (auto tmp : xi) // Sätter alla x registeer till 0 
-		tmp.reg = 0;
+	memset(&xi, 0, xi.size() * sizeof(uint32_t));
 }
 
 bool RISC::Instruction::loadProgram(std::vector<uint32_t>& input)
@@ -211,20 +211,20 @@ bool RISC::Instruction::loadProgram(std::vector<uint32_t>& input)
 bool RISC::Instruction::step()
 {
 	//Läs in hel instuktion från ram:
-	int pcPrev = pc.reg;
-	RISC::Reg32 inst;
+	int pcPrev = pc;
+	uint32_t inst = 0;
 	for (int i = 3; i >= 0; i--)
-		inst.reg += mem[pc.reg + (3 - i)] << (i * 8);
-	if (inst.reg != 0)
-		deCodeInstruction(inst.reg);
+		inst += mem[pc + (3 - i)] << (i * 8);
+	if (inst != 0)
+		deCodeInstruction(inst);
 	else {
-		std::cout << "ANS = " << xi[1].reg << "\n";
+		std::cout << "ANS = " << xi[10] << "\n";
 		std::cout << "Calculatd in " << totalInstructions << " instructions\n";
 		std::cout << "Finished program...\n"; 
 		return true;
 	}
-	if(pc.reg == pcPrev) //gå inte fram om en branch startade
-		pc.reg += 4; // Alla intruktioneeer är 8 byte (32bit) långa.
+	if(pc == pcPrev) //gå inte fram om en branch startade
+		pc += 4; // Alla intruktioner är 8 byte (32bit) långa.
 	totalInstructions++;
 	return false;
 }
@@ -272,20 +272,20 @@ void RISC::Instruction::deCodeInstruction(uint32_t inst)
 	}
 	else if (opCode == STORE) {
 		deCodeStype(inst);
-		uint32_t pos = xi[rs1].reg + imm12;
+		uint32_t pos = xi[rs1] + imm12;
 		switch (funct3)
 		{
-			case SBU:		//Gör samma som SB_	...
+			//case SBU:		//Finns inte längre... RIP
 			case SB: SB_	break;
 			case SH: SH_	break;
 			case SW: SW_	break;
-			case SHU: SHU_	break;
+			//case SHU: SHU_	break;
 			default: std::cout << "funct är negativt eller för högt...\n"; break;
 		}
 	}
 	else if (opCode == LOAD) {
 		deCodeItype(inst);
-		uint32_t pos = xi[rs1].reg + imm12;
+		uint32_t pos = xi[rs1] + imm12;
 		switch (funct3)
 		{
 			case LBU: LBU_  break;		
@@ -309,7 +309,7 @@ void RISC::Instruction::deCodeInstruction(uint32_t inst)
 			case BGEU: BGEU_	break;
 			default: std::cout << "funct är negativt eller för högt...\n";	break;
 		}
-		bool test = (xi[rs1].reg != xi[rs2].reg);
+		bool test = (xi[rs1] != xi[rs2]);
 		int h = 0;
 	}
 	else if (opCode == JAL) {
@@ -318,7 +318,7 @@ void RISC::Instruction::deCodeInstruction(uint32_t inst)
 	}
 	else if (opCode == JALR) {
 		deCodeItype(inst);
-		uint32_t pos = xi[rs1].reg + imm12; (pos = pos - (pos & 0b1));
+		uint32_t pos = xi[rs1] + imm12; (pos = pos - (pos & 0b1));
 		JALR_
 		int h = 0;
 	}
@@ -345,31 +345,31 @@ void RISC::Instruction::setMem(uint32_t pos, uint32_t val, uint8_t byteSize) // 
 void RISC::Instruction::loadMem(uint32_t pos, uint8_t byteSize, bool isSiged)
 {
 	if (byteSize == 4) {
-		xi[rd].reg =  mem[pos + 0] << 24;
-		xi[rd].reg += mem[pos + 1] << 16;
-		xi[rd].reg += mem[pos + 2] << 8;
-		xi[rd].reg += mem[pos + 3];
+		xi[rd] =  mem[pos + 0] << 24;
+		xi[rd] += mem[pos + 1] << 16;
+		xi[rd] += mem[pos + 2] << 8;
+		xi[rd] += mem[pos + 3];
 	}
 	else if (byteSize == 2) { // TESTA OM DEN SIGNEXTENDAR!
 		if (isSiged) {
 			uint32_t tmp = mem[pos + 0] << 8; tmp += mem[pos + 1];
 			tmp = signExtend(tmp, 16);
-			xi[rd].reg = tmp;
+			xi[rd] = tmp;
 		}
 		else {
 			uint32_t tmp = mem[pos + 0] << 8;
 			tmp += mem[pos + 1];
-			xi[rd].reg = tmp;
+			xi[rd] = tmp;
 		}
 	}
 	else if (byteSize == 1) {
 		if (isSiged) {
 			uint32_t tmp = mem[pos + 0];
 			tmp = signExtend(tmp, 8);
-			xi[rd].reg = tmp;
+			xi[rd] = tmp;
 		}
 		else {
-			xi[rd].reg = mem[pos + 0];
+			xi[rd] = mem[pos + 0];
 		}
 	}
 }

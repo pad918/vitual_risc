@@ -19,7 +19,7 @@ std::vector<std::string> ASM::Compiller::split(const std::string & str, const st
 	return tokens;
 }
 
-uint32_t ASM::Compiller::generateInstruction(std::string inst, std::vector<std::string> args)
+uint32_t ASM::Compiller::generateInstruction(std::string inst, std::vector<std::string> args, int lineId)
 {
 	uint32_t output = 0;
 	//MASSVIS MED AVANCERAD KOD:
@@ -127,7 +127,7 @@ uint32_t ASM::Compiller::generateInstruction(std::string inst, std::vector<std::
 		output =	output | (imm11)   << 20;
 		output =	output | (imm20)   << 31;
 	}
-	else { std::cout << "ERROR: Incorrect instuction" << std::endl; return 0; }
+	else { std::cout << "ERROR: On line: " << lineId <<" | Incorrect instuction: " << inst << std::endl; return 0; }
 
 	return output;
 }
@@ -159,7 +159,9 @@ std::vector<uint32_t> *ASM::Compiller::compile(std::string path)
 	std::string line;
 	std::ifstream file(path);
 	if (file.is_open()) {
+		int lineId = 0;
 		while (getline(file, line)) {
+			++lineId;
 			uint32_t m_code = 0;
 			std::size_t commentId = line.find_first_of(";");
 			if (commentId != std::string::npos) //if there is a comment remove it
@@ -170,7 +172,7 @@ std::vector<uint32_t> *ASM::Compiller::compile(std::string path)
 			std::size_t codeEndId = line.find_first_of(" \t");
 			if (line != "") {
 				if (codeEndId == std::string::npos) {
-					std::cout << "ERROR: INCORRECT FORMAT!";
+					std::cout << "ERROR: INCORRECT FORMAT AT LINE: " << lineId << "\n";
 					program.clear(); return &program;
 				}
 				std::string inst = line.substr(0, codeEndId);
@@ -182,7 +184,7 @@ std::vector<uint32_t> *ASM::Compiller::compile(std::string path)
 					std::size_t lastId = a.find_last_not_of(" \t"); // REMOVE BLANKS AFTER
 					if (lastId != std::string::npos && lastId != a.size() - 1) { a.erase(a.begin() + lastId + 1, a.end()); }
 				}
-				uint32_t tmpCode = generateInstruction(inst, args);
+				uint32_t tmpCode = generateInstruction(inst, args, lineId);
 				if (tmpCode != 0)
 					program.push_back(tmpCode);
 			}

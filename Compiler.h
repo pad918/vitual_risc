@@ -25,7 +25,7 @@ namespace ASM {
 		//
 		std::vector<uint32_t> program;
 		std::vector<std::string> split(const std::string& str, const std::string& delim);
-		uint32_t generateInstruction(std::string inst, std::vector<std::string> args);
+		uint32_t generateInstruction(std::string inst, std::vector<std::string> args, int lineId);
 	public:
 		Compiller();
 		std::vector<uint32_t> * compile(std::string path);
