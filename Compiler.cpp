@@ -45,6 +45,8 @@ uint32_t ASM::Compiller::generateInstruction(std::string inst, std::vector<std::
 		else if (inst == "LW")		{ output = output | (0b010 << 12); output = output | 0b0000011; }
 		else if (inst == "LBU")		{ output = output | (0b100 << 12); output = output | 0b0000011; }
 		else if (inst == "LHU")		{ output = output | (0b101 << 12); output = output | 0b0000011; }
+		//Jump instruktionen
+		else if (inst == "JALR")	{ output = output | (0b000 << 12); output = output | 0b1100111;}
 		//Annorlunda I-type instructioner
 		else if (inst == "SLLI")	{ output = output | (0b001 << 12); output = output | 0b0010011; output = output | (0b0000000 << 25); } //Bordeee typ funka...
 		else if (inst == "SRAI")	{ output = output | (0b101 << 12); output = output | 0b0010011; output = output | (0b0000000 << 25); } //Bordeee typ funka...	
@@ -109,6 +111,22 @@ uint32_t ASM::Compiller::generateInstruction(std::string inst, std::vector<std::
 		else if (inst == "BLTU")	{ output = output | (0b110 << 12); }
 		else if (inst == "BGEU")	{ output = output | (0b111 << 12); }
 	}
+	else if (std::find(_JTYPE_INSTRUCTIONS.begin(), _JTYPE_INSTRUCTIONS.end(), inst) != _JTYPE_INSTRUCTIONS.end()) { // Om det är en J_type instruktion
+		if (args.size() != 2) { std::cout << "ERROR: args invalid\n"; return 0; }
+		uint16_t	rd = std::stoi(args[0]); //699050
+		int32_t		imm12 = std::stoi(args[1]);
+		uint16_t	imm101 = 0, imm20 = 0, imm11 = 0, imm1912 = 0;
+		imm101 =	(0b1111111111			& imm12); // 0 till 9
+		imm1912 =	(0b1111111100000000000	& imm12) >> 11;
+		imm11 =		((imm12 & (1 << 10)) >> 10);
+		imm20 =		((imm12 & (1 << 19)) >> 19); // 20-1
+		output =	output | 0b1101111;//opcode
+		output =	output | (rd << 7);
+		output =	output | (imm101)  << 21;
+		output =	output | (imm1912) << 12;
+		output =	output | (imm11)   << 20;
+		output =	output | (imm20)   << 31;
+	}
 	else { std::cout << "ERROR: Incorrect instuction" << std::endl; return 0; }
 
 	return output;
@@ -127,11 +145,12 @@ ASM::Compiller::Compiller()
 		"JALR", "LB", "LH", "LW", "LBU", "LHU", "SB", "SH", "SW", "SBU", "SHU",
 		"FENCE", "FENCE.I"
 	};
-	_ITYPE_INSTRUCTIONS = {"ADDI", "SLTI", "SLTIU", "XORI", "ORI", "ANDI", "SLLI", "SRLI", "SRAI", "LB", "LH", "LW", "LBU", "LHU"};
+	_ITYPE_INSTRUCTIONS = {"ADDI", "SLTI", "SLTIU", "XORI", "ORI", "ANDI", "SLLI", "SRLI", "SRAI", "LB", "LH", "LW", "LBU", "LHU", "JALR"};
 	_RTYPE_INSTRUCTIONS = {"ADD", "SUB", "SLL", "SLT", "SLTU", "XOR", "SRL", "SRA", "OR", "AND"};
 	_STYPE_INSTRUCTIONS = {"SB", "SH", "SW", "SBU", "SHU"};
 	_UTYPE_INSTRUCTIONS = {"LUI", "AUIPC"};
 	_BTYPE_INSTRUCTIONS = {"BEQ", "BNE", "BLT", "BGE", "BLTU", "BGEU"};
+	_JTYPE_INSTRUCTIONS = {"JAL"};
 }
 
 std::vector<uint32_t> *ASM::Compiller::compile(std::string path)

@@ -94,6 +94,9 @@ BRA RESURSER:
 #define BGE_	pc.reg +=		((signed long)xi[rs1].reg >= (signed long)xi[rs2].reg) ? imm12*2 : 0;
 #define BGEU_	pc.reg +=		(xi[rs1].reg >= xi[rs2].reg) ? imm12*2 : 0;
 
+#define JAL_	xi[rd].reg = pc.reg+4; pc.reg += imm20;
+#define JALR_	;
+
 #define SB_		setMem(pos, xi[rs2].reg, 1);											//Testad - fungerar
 #define SH_		setMem(pos, xi[rs2].reg, 2);											//Inte testad
 #define SW_		setMem(pos, xi[rs2].reg, 4);											//Inte testad
@@ -163,14 +166,26 @@ void RISC::Instruction::deCodeBtype(uint32_t inst)
 {
 	funct3 = (0b00000000000000000111000000000000 & inst) >> 12;
 	rs1 = (0b11111000000000000000 & inst) >> 15;
-	rs2 = (0b1111100000000000000000000 & inst) >> 20; //FELETE ÄR HÄR <------------
+	rs2 = (0b1111100000000000000000000 & inst) >> 20;
 	//Imm12 är brutalt knullad i B-type instruktioner...
-	
 	imm12 =		(0b01111110000000000000000000000000 & inst) >> 20; //25 - 5  = 20
 	imm12 +=	(0b10000000000000000000000000000000 & inst) >> 19; //31 - 12 = 19
 	imm12 +=	(0b111100000000 & inst) >> 7; // 8-1 = 7
 	imm12 += (0b10000000 & inst) << 4; // 11 - 7 = 4
 	imm12 = signExtend(imm12, 13); // borde vara korrekt
+}
+
+void RISC::Instruction::deCodeJtype(uint32_t inst)
+{
+	funct3 = 0;
+	rd = (0b111110000000 & inst) >> 7;
+	//Imm20 är ännu mer brutalt knullad i J-type instruktioner...
+	imm20 =		(0b01111111111000000000000000000000 & inst) >> 21; // FUNGERAR!
+	imm20 +=	(inst) >> 31 << 19;; //borde typ fungera...
+	imm20 +=	(0b11111111000000000000 & inst) >> 1; // 11 - 1 = 11; 
+	imm20 +=	((inst & (1 << 20)) >> 20) << 11;
+	imm20 =		signExtend(imm20, 20);
+	imm20 *=	2;
 }
 
 RISC::Instruction::Instruction()
@@ -295,6 +310,16 @@ void RISC::Instruction::deCodeInstruction(uint32_t inst)
 			default: std::cout << "funct är negativt eller för högt...\n";	break;
 		}
 		bool test = (xi[rs1].reg != xi[rs2].reg);
+		int h = 0;
+	}
+	else if (opCode == JAL) {
+		deCodeJtype(inst);
+		JAL_
+	}
+	else if (opCode == JALR) {
+		deCodeItype(inst);
+		uint32_t pos = xi[rs1].reg + imm12; (pos = pos - (pos & 0b1));
+		JALR_
 		int h = 0;
 	}
 	else if (opCode == 123) {

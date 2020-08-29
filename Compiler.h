@@ -16,11 +16,12 @@ namespace ASM {
 		std::array<std::string, 32> _IREGISTERS;
 		std::array<std::string, 32> _FREGISTERS;
 		//Listor över instructioner av olika typer
-		std::array<std::string, 14> _ITYPE_INSTRUCTIONS;
+		std::array<std::string, 15> _ITYPE_INSTRUCTIONS;
 		std::array<std::string, 10> _RTYPE_INSTRUCTIONS;
 		std::array<std::string, 5>  _STYPE_INSTRUCTIONS;
 		std::array<std::string, 2>  _UTYPE_INSTRUCTIONS;
 		std::array<std::string, 6>  _BTYPE_INSTRUCTIONS;
+		std::array<std::string, 1>  _JTYPE_INSTRUCTIONS;
 		//
 		std::vector<uint32_t> program;
 		std::vector<std::string> split(const std::string& str, const std::string& delim);
